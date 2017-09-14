@@ -26,7 +26,8 @@ public final class Util<T> {
     /*
      * Definicion de variables de clase
      */
-    private static final Log LOG = LogFactory.getLog(Util.class);
+    @SuppressWarnings("unused")
+	private static final Log LOG = LogFactory.getLog(Util.class);
     private SimpleDateFormat formatoGeneralFecha = new SimpleDateFormat("dd/MM/yyyy");
 
     /*
@@ -49,7 +50,19 @@ public final class Util<T> {
             return null;
         }
     }
-
+    @SuppressWarnings("unused")
+	public String jsonToString(T objectRes, String json, ArrayList<String> nodos) throws ParseException {
+        Gson gson = new Gson();
+        JSONParser parser = new JSONParser();
+        Object objRes = parser.parse(json);
+        JSONObject jsonObject  = (JSONObject) objRes;
+        for (String nodo : nodos){
+            jsonObject = (JSONObject) jsonObject.get(nodo);
+        }
+        String jsonResponse = jsonObject.toJSONString();
+       return jsonResponse;
+       
+    }
     /*
      * Metodo utilitario para convertir un objeto a un json.
      */

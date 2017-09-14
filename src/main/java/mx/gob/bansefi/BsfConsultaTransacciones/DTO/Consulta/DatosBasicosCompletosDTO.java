@@ -1,7 +1,5 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta;
 
-import java.util.ArrayList;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

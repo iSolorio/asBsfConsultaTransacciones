@@ -15,8 +15,6 @@ public class ReqConsultaDTO {
 	@Getter @Setter
 	private String numsec;
 	@Getter @Setter
-	private String impaut;
-	@Getter @Setter
 	private String acuerdo;
 	@Getter @Setter
 	private String terminal;
@@ -28,5 +26,8 @@ public class ReqConsultaDTO {
 	private String acceso;
 	@Getter @Setter
 	private String impsdo;
-	
+	@Getter @Setter
+	private String entidad;
+	@Getter @Setter
+	private String formato;
 }
