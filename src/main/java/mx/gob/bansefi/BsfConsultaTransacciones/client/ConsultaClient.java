@@ -9,8 +9,15 @@ import org.springframework.stereotype.Component;
 
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ConsultaMovimientoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ResponseBansefiDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ConsultaAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ConsultaMasAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ReqConsultaAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ReqConsultaMasAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ResConsultaAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ResConsultaMasAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ConsultaBloqueoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ListaConsultaBloqueosDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ListaConsutaAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ReqConsultaBloqueoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ResConsultaBloqueosDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ConsultaDatosAcuerdoDTO;
@@ -20,6 +27,9 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.TrConsu
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ConsultaDetalleApunteDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ReqConsultaDetalleTransaccionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ResConsultaDetalleTransaccionDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ConsultaLiquidacionDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ReqConsultaLiquidacionDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ResConsultaLiquidacionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ConsultaRetencionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ListaConsultaRetencionesDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ReqConsultaRetencionDTO;
@@ -51,6 +61,12 @@ public class ConsultaClient {
 	private String urlConsultaDetalleTransaccion;
 	@Value("${url.consultaNombre}")
 	private String urlConsultaNombre;
+	@Value("${url.consultaAuditoria}")
+	private String urlConsultaAuditoria;
+	@Value("${url.consultaMasAuditoria}")
+	private String urlConsultaMasAuditoria;
+	@Value("${url.consultaLiquidacion}")
+	private String urlConsultaLiquidacion;
 	@Value("${url.consultaDatosAcuerdo}")
 	private String urlConsultaDatosAcuerdo;
 	@Value("${url.consultaRetenciones}")
@@ -645,6 +661,284 @@ public class ConsultaClient {
 				response.setCabecera(cabecera);
 			}
 		}
+		return response;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public ResConsultaAuditoriaDTO consultaAuditoria(ReqConsultaAuditoriaDTO request)
+	{
+		ResConsultaAuditoriaDTO response= new ResConsultaAuditoriaDTO();
+		ConsultaAuditoriaDTO datos= new ConsultaAuditoriaDTO();
+		ResGralDTO cabecera= new ResGralDTO();
+		String jsonRes="";
+		request.setEntidad(request.getEntidad()==null?"":request.getEntidad());
+		request.setAcuerdo(request.getAcuerdo()==null?"":request.getAcuerdo());
+		request.setPassword(request.getPassword()==null?"":request.getPassword());
+		request.setTerminal(request.getTerminal()==null?"":request.getTerminal());
+		request.setUsuario(request.getUsuario()==null?"":request.getUsuario());
+		request.setCodcuenta(request.getCodcuenta()==null?"":request.getCodcuenta());
+		request.setDetalle(request.getDetalle()==null?"":request.getDetalle());
+		if(request.getAcuerdo().equals("") || request.getCodcuenta().equals("") || request.getDetalle().equals("") || request.getEntidad().equals("") || request.getPassword().equals("") || request.getTerminal().equals("") || request.getUsuario().equals(""))
+		{
+			cabecera.setStatus(statusIncorrecto);
+			cabecera.setMensaje(errorGeneral+errornoRequest);
+		    response.setCabecera(cabecera);
+		}
+		else
+		{
+			jsonRes = this.util.callRestPost(request, urlRootContext + urlConsultaAuditoria);
+			System.out.println(jsonRes);
+			
+			if(!jsonRes.equals(""))
+			{
+				ArrayList<String> nodos = new ArrayList<String>();
+				nodos.add("EjecutarResponse");
+				nodos.add("EjecutarResult");
+				try {
+					datos = (ConsultaAuditoriaDTO) this.util.jsonToObject(datos, jsonRes, nodos);
+					if(datos.getTRANID().equals(errornoFirmado))
+					{
+						cabecera.setMensaje(errorGeneral+errorUsuario);
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}
+					
+						else
+						{
+							
+							if(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getNUMBER_OF_RECORDS().equals("0000"))
+							{
+								ArrayList<ResErrorDTO> lista= new ArrayList<ResErrorDTO>();
+								for(int i=0;i<datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getSTD_TRN_MSJ_PARM_V().size();i++)
+								{
+									ResErrorDTO errores=new ResErrorDTO();
+									errores.setCodigo(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_CODE());
+									errores.setMensaje(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_ARG1());
+									lista.add(errores);
+								}
+								cabecera.setErrores(lista);
+								cabecera.setMensaje(errorGeneral+datos.getMENSAJE());
+								cabecera.setStatus(datos.getCODIGO());
+								response.setCabecera(cabecera);
+							}
+							else
+							{
+								
+									ArrayList<ListaConsutaAuditoriaDTO> auditorias= new ArrayList<ListaConsutaAuditoriaDTO>();
+									for(int i=0;i<Integer.valueOf(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getNUMBER_OF_RECORDS());i++)
+									{
+										ListaConsutaAuditoriaDTO nodo= new ListaConsutaAuditoriaDTO();
+										nodo.setCentro(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getCOD_INTERNO_UO());
+										nodo.setCodigo(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getCOD_TX());
+										nodo.setTerminal(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_INTERNO_TERM_TN());
+										nodo.setFechaContable(util.formatearFechaGeneral("MM-dd-yyyy", datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getFECHA_CTBLE()));
+										nodo.setAutorizador(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_EMPL_AUT()==null?"":datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_EMPL_AUT());
+										nodo.setEmpleado(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_INTERNO_EMPL_EP());
+										nodo.setEstado(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getPRPDAD_CTA());
+										nodo.setHoraOperacion(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getHORA_OPRCN());
+										nodo.setFechaOperacion(util.formatearFechaGeneral("MM-dd-yyyy", datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getFECHA_OPRCN()));
+										auditorias.add(nodo);
+									}
+									cabecera.setMensaje(datos.getMENSAJE());
+									cabecera.setStatus(datos.getCODIGO());
+									response.setCabecera(cabecera);
+									response.setAuditorias(auditorias);
+									
+								
+							}
+						}
+						
+					}
+					catch (ParseException e) {
+						e.printStackTrace();
+						cabecera.setMensaje(errorParseo+e.getMessage());
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}
+				}
+				else
+				{
+					cabecera.setStatus(statusIncorrecto);
+					cabecera.setMensaje(errorGeneral+errornoRequest);
+					response.setCabecera(cabecera);
+				}
+			}
+		
+		return response;
+	}
+	/*Metodo para obtener el detalle de auditoria*/
+	@SuppressWarnings("unchecked")
+	public ResConsultaMasAuditoriaDTO consultaMasAuditoria(ReqConsultaMasAuditoriaDTO request)
+	{
+		ResConsultaMasAuditoriaDTO response = new ResConsultaMasAuditoriaDTO();
+		ResGralDTO cabecera= new ResGralDTO();
+		ConsultaMasAuditoriaDTO datos=new ConsultaMasAuditoriaDTO();
+		String jsonRes="";
+		request.setEntidad(request.getEntidad()==null?"":request.getEntidad());
+		request.setAcuerdo(request.getAcuerdo()==null?"":request.getAcuerdo());
+		request.setPassword(request.getPassword()==null?"":request.getPassword());
+		request.setTerminal(request.getTerminal()==null?"":request.getTerminal());
+		request.setUsuario(request.getUsuario()==null?"":request.getUsuario());
+		request.setEmpleado(request.getEmpleado()==null?"":request.getEmpleado());
+		request.setAutorizador(request.getAutorizador()==null?"":request.getAutorizador());
+		if(request.getAcuerdo().equals("") ||  request.getEntidad().equals("") || request.getPassword().equals("") || request.getTerminal().equals("") || request.getUsuario().equals("") || request.getEmpleado().equals(""))
+		{
+			cabecera.setStatus(statusIncorrecto);
+			cabecera.setMensaje(errorGeneral+errornoRequest);
+		    response.setCabecera(cabecera);
+		}
+		else
+		{
+			jsonRes = this.util.callRestPost(request, urlRootContext + urlConsultaMasAuditoria);
+			System.out.println(jsonRes);
+			
+			if(!jsonRes.equals(""))
+			{
+				ArrayList<String> nodos = new ArrayList<String>();
+				nodos.add("EjecutarResponse");
+				nodos.add("EjecutarResult");
+				try {
+					datos = (ConsultaMasAuditoriaDTO) this.util.jsonToObject(datos, jsonRes, nodos);
+					if(datos.getTRANID().equals(errornoFirmado))
+					{
+						cabecera.setMensaje(errorGeneral+errorUsuario);
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}
+					
+						else
+						{
+							
+							if(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getRTRN_CD().equals("0000") || datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getRTRN_CD().equals("0007"))
+							{
+								ArrayList<ResErrorDTO> lista= new ArrayList<ResErrorDTO>();
+								for(int i=0;i<datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getSTD_TRN_MSJ_PARM_V().size();i++)
+								{
+									ResErrorDTO errores=new ResErrorDTO();
+									errores.setCodigo(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_CODE());
+									errores.setMensaje(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_ARG1());
+									lista.add(errores);
+								}
+								cabecera.setErrores(lista);
+								cabecera.setMensaje(errorGeneral+datos.getMENSAJE());
+								cabecera.setStatus(datos.getCODIGO());
+								response.setCabecera(cabecera);
+							}
+							else
+							{
+								
+									
+									cabecera.setMensaje(datos.getMENSAJE());
+									cabecera.setStatus(datos.getCODIGO());
+									response.setCabecera(cabecera);
+									response.setNombreAutorizador(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getNOMB_EMPL_AUT().getNOMB_50()==null?"":datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getNOMB_EMPL_AUT().getNOMB_50());
+									response.setCodigoCentro(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getCOD_INTERNO_UO_AC_V().getCOD_INTERNO_UO()==null?"":datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getCOD_INTERNO_UO_AC_V().getCOD_INTERNO_UO());
+									response.setNombEnt(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getNOMB_ENT_EN()==null?"":datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getNOMB_ENT_EN());
+									response.setNombreEmpleado(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getNOMB_EMPL_ORIG().getNOMB_50()==null?"":datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getTR_CARGAR_AUDIT_EVT_Z().getNOMB_EMPL_ORIG().getNOMB_50());
+							}
+						}
+						
+					}
+					catch (ParseException e) {
+						e.printStackTrace();
+						cabecera.setMensaje(errorParseo+e.getMessage());
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}
+				}
+				else
+				{
+					cabecera.setStatus(statusIncorrecto);
+					cabecera.setMensaje(errorGeneral+errornoRequest);
+					response.setCabecera(cabecera);
+				}
+			}
+		return response;
+	}
+	@SuppressWarnings("unchecked")
+	public ResConsultaLiquidacionDTO consultaLiquidacion(ReqConsultaLiquidacionDTO request)
+	{
+		ResConsultaLiquidacionDTO response = new ResConsultaLiquidacionDTO();
+		ResGralDTO cabecera= new ResGralDTO();
+		ConsultaLiquidacionDTO datos= new ConsultaLiquidacionDTO();
+		String jsonRes="";
+		request.setAcuerdo(request.getAcuerdo()==null?"":request.getAcuerdo());
+		request.setDetalle(request.getDetalle()==null?"":request.getDetalle());
+		request.setEntidad(request.getEntidad()==null?"":request.getEntidad());
+		request.setFechaLiquidacion(request.getFechaLiquidacion()==null?"":request.getFechaLiquidacion());
+		request.setLiqOpcion(request.getLiqOpcion()==null?"":request.getLiqOpcion());
+		request.setPassword(request.getPassword()==null?"":request.getPassword());
+		request.setTerminal(request.getTerminal()==null?"":request.getTerminal());
+		request.setUsuario(request.getUsuario()==null?"":request.getUsuario());
+		if(request.getAcuerdo().equals("") ||  request.getEntidad().equals("") || request.getPassword().equals("") || request.getTerminal().equals("") || request.getUsuario().equals("") || request.getDetalle().equals("") || request.getLiqOpcion().equals("") || request.getFechaLiquidacion().equals(""))
+		{
+			cabecera.setStatus(statusIncorrecto);
+			cabecera.setMensaje(errorGeneral+errornoRequest);
+		    response.setCabecera(cabecera);
+		}
+		else
+		{
+			jsonRes = this.util.callRestPost(request, urlRootContext + urlConsultaLiquidacion);
+			System.out.println(jsonRes+",");
+			
+			if(!jsonRes.equals(""))
+			{
+				ArrayList<String> nodos = new ArrayList<String>();
+				nodos.add("EjecutarResponse");
+				nodos.add("EjecutarResult");
+				try {
+					datos = (ConsultaLiquidacionDTO) this.util.jsonToObject(datos, jsonRes, nodos);
+					if(datos.getTRANID().equals(errornoFirmado))
+					{
+						cabecera.setMensaje(errorGeneral+errorUsuario);
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}
+					
+						else
+						{
+							
+							if(Integer.valueOf(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getOCCURS_NR())==0)
+							{
+								ArrayList<ResErrorDTO> lista= new ArrayList<ResErrorDTO>();
+								for(int i=0;i<datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getSTD_TRN_MSJ_PARM_V().size();i++)
+								{
+									ResErrorDTO errores=new ResErrorDTO();
+									errores.setCodigo(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_CODE());
+									errores.setMensaje(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_ARG1());
+									lista.add(errores);
+								}
+								cabecera.setErrores(lista);
+								cabecera.setMensaje(errorGeneral+datos.getMENSAJE());
+								cabecera.setStatus(datos.getCODIGO());
+								response.setCabecera(cabecera);
+							}
+							else
+							{
+								
+									System.out.print(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V().get(0).getIMP_FACTURADO_V().getIMP_SDO());
+									cabecera.setMensaje(datos.getMENSAJE());
+									cabecera.setStatus(datos.getCODIGO());
+									response.setCabecera(cabecera);
+									
+							}
+						}
+						
+					}
+					catch (ParseException e) {
+						e.printStackTrace();
+						cabecera.setMensaje(errorParseo+e.getMessage());
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}
+				}
+				else
+				{
+					cabecera.setStatus(statusIncorrecto);
+					cabecera.setMensaje(errorGeneral+errornoRequest);
+					response.setCabecera(cabecera);
+				}
+			}
 		return response;
 	}
 }

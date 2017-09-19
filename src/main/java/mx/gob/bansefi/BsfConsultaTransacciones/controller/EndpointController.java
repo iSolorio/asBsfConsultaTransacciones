@@ -11,12 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.ReqConsultaGeneralDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.ResConsultaGeneralDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ConsultaMovimientoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ReqConsultaAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ReqConsultaMasAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ResConsultaAuditoriaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ResConsultaMasAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ReqConsultaBloqueoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ResConsultaBloqueosDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ReqConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ResConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ReqConsultaDetalleTransaccionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ResConsultaDetalleTransaccionDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ReqConsultaLiquidacionDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ResConsultaLiquidacionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ReqConsultaRetencionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ResConsultaRetencionesDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.ReqConsultaDTO;
@@ -71,5 +77,19 @@ public class EndpointController {
 	{
 		return consultaclient.consultaBloqueos(request);
 	}
-	
+	@RequestMapping(value="consultaAuditoria",method=RequestMethod.POST)
+	public ResConsultaAuditoriaDTO consultaAuditoria(@RequestBody ReqConsultaAuditoriaDTO request) 
+	{
+		return consultaclient.consultaAuditoria(request);
+	}
+	@RequestMapping(value="consultaMasAuditoria", method=RequestMethod.POST)
+	public ResConsultaMasAuditoriaDTO  consultaMasAuditoria(@RequestBody ReqConsultaMasAuditoriaDTO request)
+	{
+		return consultaclient.consultaMasAuditoria(request);
+	}
+	@RequestMapping(value="consultaLiquidacion", method=RequestMethod.POST)
+	public ResConsultaLiquidacionDTO consultaLiquidacion(@RequestBody ReqConsultaLiquidacionDTO request )
+	{
+		return consultaclient.consultaLiquidacion(request);
+	}
 }
