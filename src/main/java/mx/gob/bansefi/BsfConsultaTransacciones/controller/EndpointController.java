@@ -92,4 +92,6 @@ public class EndpointController {
 	{
 		return consultaclient.consultaLiquidacion(request);
 	}
+	
+		
 }

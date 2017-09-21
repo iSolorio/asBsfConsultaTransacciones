@@ -34,4 +34,6 @@ public class ConsultaMovimientoDTO {
 	private String codorigen;
 	@Getter @Setter
 	private String codapunte;
+	@Getter	@Setter
+	private String idOrigen;
 }

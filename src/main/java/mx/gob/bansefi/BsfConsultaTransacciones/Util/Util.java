@@ -101,6 +101,7 @@ public final class Util<T> {
         }
         return output;
     }
+ 
     /*
      * Metodo utilitario para limpiar mensajes de error
      */
@@ -118,16 +119,13 @@ public final class Util<T> {
      * Se agrega funcionalidad para formatear fecha desde un formato inicial al formato general de migracion.
      */
     public String formatearFechaGeneral(String formatoInicial, String fecha) {
-        SimpleDateFormat format = new SimpleDateFormat(formatoInicial);
-        String fechaFormateada;
-        try {
-            Date date = format.parse(fecha);
-            fechaFormateada = this.formatoGeneralFecha.format(date);
-        } catch (java.text.ParseException e) {
-            fechaFormateada = this.formatoGeneralFecha.format(new Date());
-        } catch (NullPointerException e) {
-            fechaFormateada = null;
-        }
+       
+    	System.out.println(fecha.length());
+        String ano=fecha.substring(0,4);
+        String mes=fecha.substring(4,6);
+        String dia=fecha.substring(6,8);
+        String fechaFormateada=dia+"/"+mes+"/"+ano;
+        
         return fechaFormateada;
     }
 }
