@@ -21,9 +21,6 @@ public class ListaConsultaBloqueosDTO {
 	private String fechaVTO;
 	@Getter
 	@Setter
-	private String concepto;
-	@Getter
-	@Setter
 	private String empleado;
 	@Getter
 	@Setter
@@ -31,4 +28,14 @@ public class ListaConsultaBloqueosDTO {
 	@Getter
 	@Setter
 	private String importe;
+	@Getter
+	@Setter
+	private String motivo;
+	@Getter
+	@Setter
+	private String numeroBloqueo;
+	@Getter
+	@Setter
+	private String cancelacion;
+	
 }

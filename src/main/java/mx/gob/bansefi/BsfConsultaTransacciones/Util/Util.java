@@ -1,20 +1,25 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.Util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Component;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 import com.google.gson.Gson;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  * Autor: Jose Angel Hernandez Gonzalez
@@ -118,14 +123,115 @@ public final class Util<T> {
     /*
      * Se agrega funcionalidad para formatear fecha desde un formato inicial al formato general de migracion.
      */
-    public String formatearFechaGeneral(String formatoInicial, String fecha) {
+    public String formatearFechaGeneral( String fecha) {
        
     	System.out.println(fecha.length());
         String ano=fecha.substring(0,4);
         String mes=fecha.substring(4,6);
         String dia=fecha.substring(6,8);
-        String fechaFormateada=dia+"/"+mes+"/"+ano;
+        return dia + "/" + mes + "/" + ano;
         
-        return fechaFormateada;
+
+    }
+    public String formatearFechaBase( String fecha) {
+
+        System.out.println(fecha.length());
+        String ano=fecha.substring(0,4);
+        String mes=fecha.substring(4,6);
+        String dia=fecha.substring(6,8);
+        return ano+"-"+mes+"-"+dia;
+
+
+    }
+    /*
+     *  Se agrga funcionalidad para formatear hora
+     */
+    public String formatearHoraGeneral (String tiempo) {
+
+        System.out.println(tiempo.length());
+        String hora = tiempo.substring(0, 2);
+        String minuto = tiempo.substring(2, 4);
+        String segundo = tiempo.substring(4, 6);
+        return hora + ":" + minuto + ":" + segundo;
+
+    }
+
+
+    public String SalidaResponse(String vista,String StrUrl,String action,String StrRep)
+    {
+        String salida="";
+        String outputString="";
+        try
+        {
+            String responseString="";
+            URL url = new URL(StrUrl);
+            URLConnection connection = url.openConnection();
+            //System.out.println(connection);
+            HttpURLConnection httpConn = (HttpURLConnection)connection;
+            //System.out.println(httpConn);
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            byte[] buffer = new byte[vista.length()];
+            buffer = vista.getBytes();
+            bout.write(buffer);
+            byte[] b = bout.toByteArray();
+            httpConn.setRequestProperty("Content-Length",
+                    String.valueOf(b.length));
+            httpConn.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
+            httpConn.setRequestProperty("SOAPAction", action);
+            httpConn.setRequestMethod("POST");
+            httpConn.setDoOutput(true);
+            httpConn.setDoInput(true);
+            OutputStream out = httpConn.getOutputStream();
+            out.write(b);
+            out.close();
+
+            InputStreamReader isr =
+                    new InputStreamReader(httpConn.getInputStream());
+            BufferedReader in = new BufferedReader(isr);
+
+            //Write the SOAP message response to a String.
+            while ((responseString = in.readLine()) != null)
+            {
+                outputString = outputString + responseString;
+            }
+            outputString = outputString.replace("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">", "");
+            outputString = outputString.replace("<soapenv:Body>", "");
+            if(StrRep.length()>0)
+            {
+                outputString = outputString.replace("<"+StrRep+" xmlns=\"http://ws.wso2.org/dataservice\">", "");
+                outputString = outputString.replace("</"+StrRep+">", "");
+            }
+            outputString = outputString.replace("</soapenv:Body>", "");
+            outputString = outputString.replace("</soapenv:Envelope>", "");
+            outputString = outputString.trim();
+            salida =outputString;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return salida;
+    }
+    public Document xmlToDocumentXML(String xml) {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        Document doc = null;
+        if (dBuilder != null) {
+            try {
+                doc = dBuilder.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return doc;
     }
 }
+

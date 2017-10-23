@@ -1,12 +1,13 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion;
-import java.util.ArrayList;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.StdTrnOParmVDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.ConsultaNombre.StdTrnMsjParmVDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Nombre.StdTrnMsjParmVDTO;
+
+import java.util.ArrayList;
 
 
 

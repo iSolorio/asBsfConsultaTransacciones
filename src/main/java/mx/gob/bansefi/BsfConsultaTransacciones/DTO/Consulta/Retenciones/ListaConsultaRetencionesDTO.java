@@ -33,5 +33,8 @@ public class ListaConsultaRetencionesDTO {
 	@Getter
 	@Setter
 	private String importe;
+	@Getter
+	@Setter
+	private String numSec;
 	
 }

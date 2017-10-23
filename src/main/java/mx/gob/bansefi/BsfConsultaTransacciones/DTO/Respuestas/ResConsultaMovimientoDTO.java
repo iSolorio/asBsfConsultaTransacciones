@@ -1,12 +1,12 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.DTO.Respuestas;
 
-import java.util.ArrayList;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ConsultaMovimientoDTO;
+
+import java.util.ArrayList;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +17,13 @@ public class ResConsultaMovimientoDTO {
 	@Getter
 	@Setter
 	private String cantidad;
-	@Getter @Setter 
+	@Getter
+	@Setter
+	private String fechaOperacion;
+	@Getter
+	@Setter
+	private String horaOperacion;
+	@Getter
+	@Setter
 	private ArrayList<ConsultaMovimientoDTO> lista;
 }

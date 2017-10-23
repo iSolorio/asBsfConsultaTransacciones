@@ -1,22 +1,13 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.controller;
 
-import java.util.ArrayList;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.ReqConsultaGeneralDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.ResConsultaGeneralDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ConsultaMovimientoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ReqConsultaAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ReqConsultaMasAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ResConsultaAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria.ResConsultaMasAuditoriaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ReqConsultaBloqueoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.ResConsultaBloqueosDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ReqConsultaChequeDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ResConsultaChequeDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ReqConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ResConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ReqConsultaDetalleTransaccionDTO;
@@ -25,13 +16,24 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ReqConsu
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ResConsultaLiquidacionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ReqConsultaRetencionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ResConsultaRetencionesDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Anotaciones.ReqConsultaAnotacionesDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Anotaciones.ResConsultaAnotacionesDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleAnotacion.ReqConsultaDetalleAnotacionDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleAnotacion.ResConsultaDetalleAnotacionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.ReqConsultaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.RequestConsultaNombreDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.ResConsultaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Respuestas.ResConsultaMovimientoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Respuestas.ResConsultaNombreDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.client.ConsultaClient;
 import mx.gob.bansefi.BsfConsultaTransacciones.Util.Util;
+import mx.gob.bansefi.BsfConsultaTransacciones.client.ConsultaClient;
+import mx.gob.bansefi.BsfConsultaTransacciones.service.ConsultaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.text.ParseException;
 
 
 @SuppressWarnings("unused")
@@ -41,7 +43,8 @@ public class EndpointController {
 
 	@Autowired
 	public ConsultaClient consultaclient;
-	
+	@Autowired
+	public ConsultaService consultaService;
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	public Util util;
@@ -69,6 +72,7 @@ public class EndpointController {
 	@RequestMapping(value="consultaRetenciones", method=RequestMethod.POST)
 	public ResConsultaRetencionesDTO consultaRetenciones(@RequestBody ReqConsultaRetencionDTO request)
 	{
+		System.out.println("nada");
 		return consultaclient.consultaRetenciones(request);
 	}
 	
@@ -91,6 +95,20 @@ public class EndpointController {
 	public ResConsultaLiquidacionDTO consultaLiquidacion(@RequestBody ReqConsultaLiquidacionDTO request )
 	{
 		return consultaclient.consultaLiquidacion(request);
+	}
+	@RequestMapping(value="consultaCheque", method=RequestMethod.POST)
+	public ResConsultaChequeDTO consultaCheque(@RequestBody ReqConsultaChequeDTO request)
+	{
+		return consultaclient.consultaCheque(request);
+	}
+	@RequestMapping(value="consultaAnotaciones",method=RequestMethod.POST)
+	public ResConsultaAnotacionesDTO consultaAnotaciones(@RequestBody ReqConsultaAnotacionesDTO request) {
+		return consultaService.consultaAnotaciones(request);
+	}
+	@RequestMapping(value="consultaDetalleAnotacion",method=RequestMethod.POST)
+	public ResConsultaDetalleAnotacionDTO consultaDetalleAnotacion(@RequestBody ReqConsultaDetalleAnotacionDTO request)
+	{
+		return consultaService.consultaDetalleAnotacion(request);
 	}
 	
 		

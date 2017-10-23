@@ -11,6 +11,12 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Respuestas.ResGralDTO;
 public class ResConsultaDetalleTransaccionDTO {
 	@Getter
 	@Setter
+	private String tipoCuenta;
+	@Getter
+	@Setter
+	private String conceptoTipo;
+	@Getter
+	@Setter
 	private ResGralDTO cabecera;
 	@Getter
 	@Setter

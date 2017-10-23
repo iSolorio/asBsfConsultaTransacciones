@@ -10,14 +10,20 @@ import lombok.Setter;
 public class ConsultaDatosAcuerdoDTO {
 	@Getter
 	@Setter
-	private String ID_INTERNO_PE;
+	private String TRANID;
 	@Getter
 	@Setter
-	private String COD_ID_EXT_PERS;
+	private String ESTATUS;
 	@Getter
 	@Setter
-	private String ID_EXT_PE;
+	private String CODIGO;
 	@Getter
 	@Setter
-	private String NOMB_50;
+	private String NUMTASK;
+	@Getter
+	@Setter
+	private String MENSAJE;
+	@Getter
+	@Setter
+	private ResponseBansefiDTO ResponseBansefi;
 }

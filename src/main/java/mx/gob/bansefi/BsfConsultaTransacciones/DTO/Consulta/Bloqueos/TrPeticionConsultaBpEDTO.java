@@ -1,11 +1,12 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos;
-import java.util.ArrayList;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.CodInternoUoDTO;
+
+import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrPeticionConsultaBpEDTO {

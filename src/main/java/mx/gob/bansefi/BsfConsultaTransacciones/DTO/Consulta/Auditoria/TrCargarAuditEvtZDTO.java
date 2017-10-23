@@ -1,9 +1,9 @@
 package mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Auditoria;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.CodInternoUoDTO;
 @AllArgsConstructor
 @NoArgsConstructor

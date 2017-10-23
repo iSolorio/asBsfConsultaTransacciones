@@ -26,5 +26,5 @@ public class BpBloqueoPrtcnEDTO {
     private String MOTIVO_BLQ_PRTCN; 
     @Getter
     @Setter
-    private String MOTIVO_CANC_ANTI;
+    private String MOTIVO_CANC_ANTIC;
 }
