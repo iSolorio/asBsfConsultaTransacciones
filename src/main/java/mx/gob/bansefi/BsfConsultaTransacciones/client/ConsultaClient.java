@@ -6,10 +6,14 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ConsultaChequ
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ReqConsultaChequeDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ResConsultaChequeDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ConsultaMovimientoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.CuentaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ListaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ReqConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ResConsultaDatosAcuerdoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ConsultaDatosPorAcuerdoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ReqConsultaDatosPorAcuerdoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ResConsultaDatosPorAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ConsultaDetalleApunteDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ReqConsultaDetalleTransaccionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ResConsultaDetalleTransaccionDTO;
@@ -17,10 +21,8 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.Consulta
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ListaLiquidacionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ReqConsultaLiquidacionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ResConsultaLiquidacionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ConsultaRetencionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ListaConsultaRetencionesDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ReqConsultaRetencionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.ResConsultaRetencionesDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ReqCatalogoClienteDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.*;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Nombre.ConsultaNombreDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.ReqConsultaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.RequestConsultaNombreDTO;
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 
 /*Componente encargado de realizar la consulta de transacciones*/
@@ -72,6 +75,10 @@ public class ConsultaClient {
 	private String urlConsultaRetenciones;
 	@Value("${url.consultaBloqueos}")
 	private String urlConsultaBloqueos;
+	@Value("${url.consultaDatosPorAcuerdo}")
+	private String urlDatosPorAcuerdo;
+	@Value("${url.consultaCuenta}")
+	private String urlcatalogoCuenta;
 	@Value("${error.parseo}")
 	private String errorParseo;
 	@Value("${error.usuario}")
@@ -90,6 +97,8 @@ public class ConsultaClient {
 	private String ejecutarResponse;
 	@Value("${nodo.EjecutarResult}")
 	private String ejecutarResult;
+	@Value("${nodo.Tipo}")
+	private String tipo;
 	@Value("${nodo.Ceros}")
 	private String Ceros;
 	
@@ -103,6 +112,7 @@ public class ConsultaClient {
 		ArrayList<ConsultaMovimientoDTO> transacciones = new ArrayList<ConsultaMovimientoDTO>();
 		ResGralDTO cabecera = new ResGralDTO();
 		ResConsultaMovimientoDTO respuesta = new ResConsultaMovimientoDTO();
+		CuentaDTO catalogoCliente= new CuentaDTO();
 		request.setAcceso(request.getAcceso() == null ? "" : request.getAcceso());
 		request.setAcuerdo(request.getAcuerdo() == null ? "" : request.getAcuerdo());
 		request.setEntidad(request.getEntidad() == null ? "" : request.getEntidad());
@@ -140,8 +150,7 @@ public class ConsultaClient {
 					} else {
 						if (Integer.valueOf(datos.getResponseBansefi().getOTR_CONSULTA_APNTES_PSV_T()
 								.getNUMBER_OF_RECORDS()) != 0 || Integer.valueOf(datos.getResponseBansefi().getOTR_CONSULTA_APNTES_PSV_T().getRTRN_CD()).compareTo(7)<0) {
-							System.out.println(
-									datos.getResponseBansefi().getOTR_CONSULTA_APNTES_PSV_T().getNUMBER_OF_RECORDS());
+
 							for (int i = 0; i < Integer.valueOf(datos.getResponseBansefi()
 									.getOTR_CONSULTA_APNTES_PSV_T().getNUMBER_OF_RECORDS()); i++) {
 								ConsultaMovimientoDTO res = new ConsultaMovimientoDTO();
@@ -345,7 +354,17 @@ public class ConsultaClient {
 									.getTR_AF_CONS_APUNTE_EVT_Z().getDESCR_PDV_V().getNOMB_PDV());
 							response.setTipoOperacion(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
 									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getCOD_ORIGEN());
-							response.setTipoDescripcion("");
+							response.setTipoCuenta(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O().getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getCOD_CTA());
+							ReqCatalogoClienteDTO nada= new ReqCatalogoClienteDTO();
+							nada.setCodigo(response.getTipoCuenta());
+							System.out.println(urlRootContext+urlcatalogoCuenta);
+							String catalogo= util.callRestPost(nada,urlRootContext+urlcatalogoCuenta);
+							System.out.println(catalogo);
+							CuentaDTO cuenta= new CuentaDTO();
+							ArrayList<String> nodelist= new ArrayList<>();
+							nodelist.add(tipo);
+							cuenta=(CuentaDTO)util.jsonToObject(cuenta,catalogo,nodelist);
+							response.setTipoDescripcion(cuenta.getDescripcion().getDESCR_CTA());
 							cabecera.setMensaje(datos.getMENSAJE());
 							cabecera.setStatus(datos.getESTATUS());
 							response.setCabecera(cabecera);
@@ -1060,8 +1079,6 @@ public class ConsultaClient {
 									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getIMP_TOTAL_LIQ());
 							response.setImportePendiente(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
 									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getIMP_PEND_LIQ());
-							datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().get
-
 							for (int i = 0; i < Integer.valueOf(datos.getResponseBansefi()
 									.getOTR_LIQ_CONS_BASICA_TRN_O().getTR_LIQ_CONS_BASICA_EVT_Z()
 									.getLIQ_APUNTE_BAS_LST().getNUMBER_OF_RECORDS()); i++) {
@@ -1210,6 +1227,58 @@ public class ConsultaClient {
 		return response;
 
 	}
+	public ResConsultaDatosPorAcuerdoDTO consultaDatosPorAcuerdo(ReqConsultaDatosPorAcuerdoDTO request){
+		ResConsultaDatosPorAcuerdoDTO response= new ResConsultaDatosPorAcuerdoDTO();
+		ConsultaDatosPorAcuerdoDTO datos= new ConsultaDatosPorAcuerdoDTO();
+		ResGralDTO cabecera = new ResGralDTO();
+		Optional.ofNullable(request.getAcuerdo()).orElse("");
+		Optional.ofNullable(request.getEntidad()).orElse("");
+		Optional.ofNullable(request.getUsuario()).orElse("");
+		Optional.ofNullable(request.getPassword()).orElse("");
+		if (request.getAcuerdo().equals("") || request.getEntidad().equals("") || request.getPassword().equals("") || request.getUsuario().equals("")){
+			cabecera.setStatus(statusIncorrecto);
+			cabecera.setMensaje(errorGeneral + errornoRequest);
+			response.setCabecera(cabecera);
+		}else{
+			String jsonRes = this.util.callRestPost(request, urlRootContext + urlDatosPorAcuerdo);
+			System.out.println(jsonRes + ",");
+			Optional.ofNullable(jsonRes).orElse("");
+			if (!jsonRes.equals("")){
+				jsonRes=jsonRes.replaceAll("-","_");
+				try {
+					ArrayList<String> nodos = new ArrayList<String>();
+					nodos.add(ejecutarResponse);
+					nodos.add(ejecutarResult);
+					datos = (ConsultaDatosPorAcuerdoDTO) this.util.jsonToObject(datos, jsonRes, nodos);
+					System.out.println(datos.getResponseBansefi().getResponseBansefi().getID_INTERNO_PE());
+					if (datos.getTRANID().equals(errornoFirmado)) {
+						cabecera.setMensaje(errorGeneral + errorUsuario);
+						cabecera.setStatus(statusIncorrecto);
+						response.setCabecera(cabecera);
+					}else{
+						if (Integer.valueOf(datos.getESTATUS())==1){
+							cabecera.setMensaje(errorGeneral);
+							cabecera.setStatus(statusIncorrecto);
+							response.setCabecera(cabecera);
+						}else{
+							cabecera.setMensaje(datos.getMENSAJE());
+							cabecera.setStatus(datos.getCODIGO());
+							response.setCabecera(cabecera);
+							response.setIdInternoPe(datos.getResponseBansefi().getResponseBansefi().getID_INTERNO_PE());
+							response.setNombre(datos.getResponseBansefi().getResponseBansefi().getNOMBRE());
+						}
+					}
+				}catch (Exception e){
+					e.printStackTrace();
+					cabecera.setMensaje(errorParseo + e.getMessage());
+					cabecera.setStatus(statusIncorrecto);
+					response.setCabecera(cabecera);
+				}
 
+			}
+		}
+
+		return response;
+	}
 
 }

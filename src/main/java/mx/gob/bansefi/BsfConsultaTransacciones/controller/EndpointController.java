@@ -10,6 +10,8 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ReqConsultaCh
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ResConsultaChequeDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ReqConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ResConsultaDatosAcuerdoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ReqConsultaDatosPorAcuerdoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ResConsultaDatosPorAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ReqConsultaDetalleTransaccionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ResConsultaDetalleTransaccionDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ReqConsultaLiquidacionDTO;
@@ -106,10 +108,13 @@ public class EndpointController {
 		return consultaService.consultaAnotaciones(request);
 	}
 	@RequestMapping(value="consultaDetalleAnotacion",method=RequestMethod.POST)
-	public ResConsultaDetalleAnotacionDTO consultaDetalleAnotacion(@RequestBody ReqConsultaDetalleAnotacionDTO request)
-	{
+	public ResConsultaDetalleAnotacionDTO consultaDetalleAnotacion(@RequestBody ReqConsultaDetalleAnotacionDTO request){
 		return consultaService.consultaDetalleAnotacion(request);
 	}
-	
+	@RequestMapping(value="consultaDatosPorAcuerdo", method=RequestMethod.POST)
+	public ResConsultaDatosPorAcuerdoDTO consultaDatosPorAcuerdo(@RequestBody ReqConsultaDatosPorAcuerdoDTO request){
+		return consultaclient.consultaDatosPorAcuerdo(request);
+	}
+
 		
 }
