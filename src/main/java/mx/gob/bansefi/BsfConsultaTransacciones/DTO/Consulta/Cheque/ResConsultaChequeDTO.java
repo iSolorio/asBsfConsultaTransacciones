@@ -10,6 +10,9 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Respuestas.ResGralDTO;
 public class ResConsultaChequeDTO {
 	@Getter
 	@Setter
+	private String fechaVencimiento;
+	@Getter
+	@Setter
 	private  ResGralDTO cabecera;
 	@Getter
 	@Setter

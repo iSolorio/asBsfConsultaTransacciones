@@ -16,6 +16,9 @@ public class ResConsultaDetalleAnotacionDTO {
 	private String idEmpleado;
 	@Getter
 	@Setter
+	private String nombreEmpleado;
+	@Getter
+	@Setter
 	private String fechaPlanificacion;
 	@Getter
 	@Setter

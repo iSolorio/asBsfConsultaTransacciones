@@ -28,4 +28,7 @@ public class ReqConsultaAuditoriaDTO {
 	@Getter
 	@Setter
 	private String detalle;
+	@Getter
+	@Setter
+	private String sucursal;
 }

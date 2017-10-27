@@ -81,5 +81,7 @@ public class ResConsultaDetalleTransaccionDTO {
 	@Getter
 	@Setter
 	private String concepto;
-	
+	@Getter
+	@Setter
+	private String texto;
 }

@@ -5,8 +5,8 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Bloqueos.*;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ConsultaChequeDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ReqConsultaChequeDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Cheque.ResConsultaChequeDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ConsultaMovimientoDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.CuentaDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Transaccion.ConsultaMovimientoDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Transaccion.CuentaDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ConsultaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ListaDatosAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ReqConsultaDatosAcuerdoDTO;
@@ -14,14 +14,6 @@ import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosAcuerdo.ResCons
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ConsultaDatosPorAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ReqConsultaDatosPorAcuerdoDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DatosPorAcuerdo.ResConsultaDatosPorAcuerdoDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ConsultaDetalleApunteDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ReqConsultaDetalleTransaccionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.DetalleTransaccion.ResConsultaDetalleTransaccionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ConsultaLiquidacionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ListaLiquidacionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ReqConsultaLiquidacionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Liquidacion.ResConsultaLiquidacionDTO;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ReqCatalogoClienteDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Retenciones.*;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Nombre.ConsultaNombreDTO;
 import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Request.ReqConsultaDTO;
@@ -57,16 +49,10 @@ public class ConsultaClient {
 	private String urlRootContext;
 	@Value("${url.consultaTransaccion}")
 	private String urlConsultaTransaccion;
-	@Value("${url.consultaDetalleTransaccion}")
-	private String urlConsultaDetalleTransaccion;
 	@Value("${url.consultaNombre}")
 	private String urlConsultaNombre;
-	@Value("${url.consultaAuditoria}")
-	private String urlConsultaAuditoria;
 	@Value("${url.consultaMasAuditoria}")
 	private String urlConsultaMasAuditoria;
-	@Value("${url.consultaLiquidacion}")
-	private String urlConsultaLiquidacion;
 	@Value("${url.consultaCheque}")
 	private String urlConsultaCheque;
 	@Value("${url.consultaDatosAcuerdo}")
@@ -77,8 +63,7 @@ public class ConsultaClient {
 	private String urlConsultaBloqueos;
 	@Value("${url.consultaDatosPorAcuerdo}")
 	private String urlDatosPorAcuerdo;
-	@Value("${url.consultaCuenta}")
-	private String urlcatalogoCuenta;
+
 	@Value("${error.parseo}")
 	private String errorParseo;
 	@Value("${error.usuario}")
@@ -91,6 +76,8 @@ public class ConsultaClient {
 	private String errornoFirmado;
 	@Value("${status.correcto}")
 	private String statusCorrecto;
+	@Value("${status.tcb}")
+	private String statusTCB;
 	@Value("${status.incorrecto}")
 	private String statusIncorrecto;
 	@Value("${nodo.EjecutarResponse}")
@@ -202,7 +189,7 @@ public class ConsultaClient {
 								transacciones.add(res);
 							}
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getESTATUS());
+							cabecera.setStatus(statusCorrecto);
 							respuesta.setCantidad(
 									datos.getResponseBansefi().getOTR_CONSULTA_APNTES_PSV_T().getNUMBER_OF_RECORDS());
 							respuesta.setCabecera(cabecera);
@@ -222,8 +209,8 @@ public class ConsultaClient {
 								lista.add(errores);
 							}
 							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setMensaje(errorGeneral +":"+datos.getCODIGO()+"-"+ datos.getMENSAJE());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_CONSULTA_APNTES_PSV_T().getRTRN_CD());
 							respuesta.setCabecera(cabecera);
 							respuesta.setLista(transacciones);
 
@@ -249,158 +236,7 @@ public class ConsultaClient {
 
 	}
 
-	/* Consulta detalles de una transaccion */
-	@SuppressWarnings("unchecked")
-	public ResConsultaDetalleTransaccionDTO consultaDetalletransaccion(ReqConsultaDetalleTransaccionDTO request) {
-		ResConsultaDetalleTransaccionDTO response = new ResConsultaDetalleTransaccionDTO();
-		ResGralDTO cabecera = new ResGralDTO();
-		ConsultaDetalleApunteDTO datos = new ConsultaDetalleApunteDTO();
-		request.setAcuerdo(request.getAcuerdo() == null ? "" : request.getAcuerdo());
-		request.setCodapunte(request.getCodapunte() == null ? "" : request.getCodapunte());
-		request.setCodcuenta(request.getCodcuenta() == null ? "" : request.getCodcuenta());
-		request.setCodorigen(request.getCodorigen() == null ? "" : request.getCodorigen());
-		request.setDetalle(request.getDetalle() == null ? "" : request.getDetalle());
-		request.setEntidad(request.getEntidad() == null ? "" : request.getEntidad());
-		request.setFecha(request.getFecha() == null ? "" : request.getFecha());
-		request.setImporte(request.getImporte() == null ? "" : request.getImporte());
-		request.setSigno(request.getSigno() == null ? "" : request.getSigno());
-		request.setPassword(request.getPassword() == null ? "" : request.getPassword());
-		request.setTerminal(request.getTerminal() == null ? "" : request.getTerminal());
-		request.setUsuario(request.getUsuario() == null ? "" : request.getUsuario());
-		if (request.getAcuerdo().equals("") || request.getCodapunte().equals("") || request.getCodcuenta().equals("")
-				|| request.getCodorigen().equals("") || request.getDetalle().equals("")
-				|| request.getEntidad().equals("") || request.getFecha().equals("") || request.getImporte().equals("")
-				|| request.getPassword().equals("") || request.getSigno().equals("") || request.getTerminal().equals("")
-				|| request.getUsuario().equals("")) {
-			cabecera.setStatus(statusIncorrecto);
-			cabecera.setMensaje(errorGeneral + errornoRequest);
-			response.setCabecera(cabecera);
-			return response;
-		} else {
-			try {
-				System.out.println(urlRootContext + urlConsultaDetalleTransaccion);
-				String jsonRes = this.util.callRestPost(request, urlRootContext + urlConsultaDetalleTransaccion);
-				System.out.println(jsonRes);
-				if (!jsonRes.equals("")) {
-					ArrayList<String> nodos = new ArrayList<String>();
-					nodos.add(ejecutarResponse);
-					nodos.add(ejecutarResult);
-					datos = (ConsultaDetalleApunteDTO) this.util.jsonToObject(datos, jsonRes, nodos);
-					if (datos.getTRANID().equals(errornoFirmado)) {
-						cabecera.setMensaje(errorGeneral + errorUsuario);
-						cabecera.setStatus(statusIncorrecto);
-						response.setCabecera(cabecera);
-					} else {
-						if (datos.getESTATUS().equals(statusCorrecto)) {
-							response.setConcepto(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getCONCPT_APNTE());
-							response.setEstado(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getPRPDAD_CTA());
-							response.setFechaContable(
-									util.formatearFechaGeneral(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-											.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getFECHA_CTBLE()));
-							response.setFechaValor(
-									util.formatearFechaGeneral(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-											.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getFECHA_VALOR()));
-							response.setImporte(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIMP_APNTE());
-							response.setIndicador1(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1());
-							response.setIndicador2(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_2());
-							response.setIndicador3(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_3());
-							response.setIndicador4(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_4());
-							response.setIndicador5(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_5());
-							response.setIndicador6(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_6());
-							response.setIndicador7(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_7());
-							response.setIndicador8(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_8());
-							response.setIndicador9(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_9());
-							response.setIndicador10(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_1() == null ? ""
-											: datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-													.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getIND_10());
-							response.setMoneda(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getCOD_NUMRCO_MONEDA());
-							response.setNombre(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getNOMB_50());
-							response.setNumero(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getNUM_SEC());
-							response.setProducto(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getDESCR_PDV_V().getNOMB_PDV());
-							response.setTipoOperacion(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getCOD_ORIGEN());
-							response.setTipoCuenta(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O().getTR_AF_CONS_APUNTE_EVT_Z().getAF_APNTE_E().getCOD_CTA());
-							ReqCatalogoClienteDTO nada= new ReqCatalogoClienteDTO();
-							nada.setCodigo(response.getTipoCuenta());
-							System.out.println(urlRootContext+urlcatalogoCuenta);
-							String catalogo= util.callRestPost(nada,urlRootContext+urlcatalogoCuenta);
-							System.out.println(catalogo);
-							CuentaDTO cuenta= new CuentaDTO();
-							ArrayList<String> nodelist= new ArrayList<>();
-							nodelist.add(tipo);
-							cuenta=(CuentaDTO)util.jsonToObject(cuenta,catalogo,nodelist);
-							response.setTipoDescripcion(cuenta.getDescripcion().getDESCR_CTA());
-							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getESTATUS());
-							response.setCabecera(cabecera);
-						} else {
 
-							ArrayList<ResErrorDTO> lista = new ArrayList<ResErrorDTO>();
-							for (int i = 0; i < datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-									.getSTD_TRN_MSJ_PARM_V().size(); i++) {
-								ResErrorDTO errores = new ResErrorDTO();
-								errores.setCodigo(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-										.getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_CODE());
-								errores.setMensaje(datos.getResponseBansefi().getOTR_AF_CONS_APUNTE_TRN_O()
-										.getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_ARG1());
-								lista.add(errores);
-							}
-							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
-							response.setCabecera(cabecera);
-						}
-					}
-				} else {
-					cabecera.setStatus(statusIncorrecto);
-					cabecera.setMensaje(errorGeneral + errornoRequest);
-					response.setCabecera(cabecera);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				e.printStackTrace();
-				cabecera.setMensaje(errorParseo + e.getMessage());
-				response.setCabecera(cabecera);
-			}
-		}
-
-		return response;
-	}
 
 	/* Consulta minima para obtener el nombre */
 	@SuppressWarnings("unchecked")
@@ -434,14 +270,14 @@ public class ConsultaClient {
 						cabecera.setStatus(statusIncorrecto);
 						response.setCabecera(cabecera);
 					} else {
-						if (datos.getESTATUS().equals(statusCorrecto)) {
+						if (Integer.valueOf(datos.getESTATUS())==0) {
 							response.setIdExt(datos.getResponseBansefi().getOTR_PE_CL_CB_DA_CNS_TRN_O()
 									.getTR_PE_CL_CB_DA_CNS_EVT_Z().getID_EXT_PE());
 							response.setIdInternoPe(datos.getResponseBansefi().getOTR_PE_CL_CB_DA_CNS_TRN_O()
 									.getTR_PE_CL_CB_DA_CNS_EVT_Z().getID_INTERNO_PE());
 							response.setNombre(datos.getResponseBansefi().getOTR_PE_CL_CB_DA_CNS_TRN_O()
 									.getTR_PE_CL_CB_DA_CNS_EVT_Z().getNOMB_50());
-							cabecera.setStatus(datos.getESTATUS());
+							cabecera.setStatus(statusCorrecto);
 							cabecera.setMensaje(datos.getMENSAJE());
 							response.setCabecera(cabecera);
 						} else {
@@ -457,8 +293,8 @@ public class ConsultaClient {
 								lista.add(errores);
 							}
 							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setMensaje(errorGeneral+":"+datos.getCODIGO()+"-" + datos.getMENSAJE());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_PE_CL_CB_DA_CNS_TRN_O().getRTRN_CD());
 							response.setCabecera(cabecera);
 
 						}
@@ -526,8 +362,8 @@ public class ConsultaClient {
 								lista.add(errores);
 							}
 							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setMensaje(errorGeneral+":"+datos.getCODIGO()+"-" + datos.getMENSAJE());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_CONSU_SELECTIV2_AC_TR().getRTRN_CD());
 							response.setCabecera(cabecera);
 						} else {
 							ArrayList<ListaDatosAcuerdoDTO> lista = new ArrayList<ListaDatosAcuerdoDTO>();
@@ -544,7 +380,7 @@ public class ConsultaClient {
 								lista.add(nodo);
 							}
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusCorrecto);
 							response.setNombres(lista);
 							response.setCabecera(cabecera);
 
@@ -602,8 +438,7 @@ public class ConsultaClient {
 						cabecera.setStatus(statusIncorrecto);
 						response.setCabecera(cabecera);
 					} else {
-						if (datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR().getNUMBER_OF_RECORDS()
-								.equals("0000")) {
+						if (Integer.valueOf(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR().getNUMBER_OF_RECORDS())==0) {
 							ArrayList<ResErrorDTO> lista = new ArrayList<ResErrorDTO>();
 							for (int i = 0; i < datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR()
 									.getSTD_TRN_MSJ_PARM_V().size(); i++) {
@@ -615,8 +450,8 @@ public class ConsultaClient {
 								lista.add(errores);
 							}
 							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setMensaje(errorGeneral +":"+datos.getCODIGO()+"-"+ datos.getMENSAJE());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR().getRTRN_CD());
 							response.setCabecera(cabecera);
 						} else {
 
@@ -625,8 +460,7 @@ public class ConsultaClient {
 									.getOTR_CONSULTA_GLOBAL_RT_TR().getNUMBER_OF_RECORDS()); i++) {
 								ListaConsultaRetencionesDTO nodo = new ListaConsultaRetencionesDTO();
 								nodo.setTipo(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR()
-										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E()
-										.getCOD_LINEA());
+										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E().getCOD_ORIGEN());
 								nodo.setConcepto(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR()
 										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E()
 										.getCONCPT_APNTE());
@@ -639,19 +473,16 @@ public class ConsultaClient {
 										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E()
 										.getFECHA_VALOR());
 								nodo.setFechaVTO(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR().getTR_CONSULTA_GLOBAL_RT_EVT().getRT_F_VTO_V().get(i).getFECHA_OPRCN());
-								nodo.setImporte(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR()
-										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getIMP_SDO());
-								;
-								nodo.setOrigen(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR()
-										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E()
-										.getID_ORGN_APNTE());
+								nodo.setImporte(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR().getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E().getIMP_APNTE());
+
+								nodo.setOrigen(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR().getTR_CONSULTA_GLOBAL_RT_EVT().getID_ORGN_APNTE_V().get(i).getSTD_CHAR_50());
 								nodo.setNumSec(datos.getResponseBansefi().getOTR_CONSULTA_GLOBAL_RT_TR()
 										.getTR_CONSULTA_GLOBAL_RT_EVT().getTR_AF_CONS_EVT_V().get(i).getAF_APNTE_E()
 										.getNUM_SEC());
 								retenciones.add(nodo);
 							}
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusCorrecto);
 							response.setCabecera(cabecera);
 							response.setRetenciones(retenciones);
 
@@ -723,7 +554,7 @@ public class ConsultaClient {
 							}
 							cabecera.setErrores(lista);
 							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_PETICION_CONSULTA_BP().getRTRN_CD());
 							response.setCabecera(cabecera);
 						} else {
 
@@ -766,7 +597,7 @@ public class ConsultaClient {
 								bloqueos.add(nodo);
 							}
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusCorrecto);
 							response.setCabecera(cabecera);
 							response.setBloqueos(bloqueos);
 
@@ -788,116 +619,6 @@ public class ConsultaClient {
 		return response;
 	}
 
-	/* Consulta la auditoria de un movimiento */
-	@SuppressWarnings("unchecked")
-	public ResConsultaAuditoriaDTO consultaAuditoria(ReqConsultaAuditoriaDTO request) {
-		ResConsultaAuditoriaDTO response = new ResConsultaAuditoriaDTO();
-		ConsultaAuditoriaDTO datos = new ConsultaAuditoriaDTO();
-		ResGralDTO cabecera = new ResGralDTO();
-		String jsonRes = "";
-		request.setEntidad(request.getEntidad() == null ? "" : request.getEntidad());
-		request.setAcuerdo(request.getAcuerdo() == null ? "" : request.getAcuerdo());
-		request.setPassword(request.getPassword() == null ? "" : request.getPassword());
-		request.setTerminal(request.getTerminal() == null ? "" : request.getTerminal());
-		request.setUsuario(request.getUsuario() == null ? "" : request.getUsuario());
-		request.setCodcuenta(request.getCodcuenta() == null ? "" : request.getCodcuenta());
-		request.setDetalle(request.getDetalle() == null ? "" : request.getDetalle());
-		if (request.getAcuerdo().equals("") || request.getCodcuenta().equals("") || request.getDetalle().equals("")
-				|| request.getEntidad().equals("") || request.getPassword().equals("")
-				|| request.getTerminal().equals("") || request.getUsuario().equals("")) {
-			cabecera.setStatus(statusIncorrecto);
-			cabecera.setMensaje(errorGeneral + errornoRequest);
-			response.setCabecera(cabecera);
-		} else {
-			jsonRes = this.util.callRestPost(request, urlRootContext + urlConsultaAuditoria);
-			System.out.println(jsonRes);
-
-			if (!jsonRes.equals("")) {
-				ArrayList<String> nodos = new ArrayList<String>();
-				nodos.add(ejecutarResponse);
-				nodos.add(ejecutarResult);
-				try {
-					datos = (ConsultaAuditoriaDTO) this.util.jsonToObject(datos, jsonRes, nodos);
-					if (datos.getTRANID().equals(errornoFirmado)) {
-						cabecera.setMensaje(errorGeneral + errorUsuario);
-						cabecera.setStatus(statusIncorrecto);
-						response.setCabecera(cabecera);
-					}
-
-					else {
-
-						if (datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O().getNUMBER_OF_RECORDS()
-								.equals("0000")) {
-							ArrayList<ResErrorDTO> lista = new ArrayList<ResErrorDTO>();
-							for (int i = 0; i < datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-									.getSTD_TRN_MSJ_PARM_V().size(); i++) {
-								ResErrorDTO errores = new ResErrorDTO();
-								errores.setCodigo(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_CODE());
-								errores.setMensaje(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_ARG1());
-								lista.add(errores);
-							}
-							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
-							response.setCabecera(cabecera);
-						} else {
-
-							ArrayList<ListaConsutaAuditoriaDTO> auditorias = new ArrayList<ListaConsutaAuditoriaDTO>();
-							for (int i = 0; i < Integer.valueOf(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-									.getNUMBER_OF_RECORDS()); i++) {
-								ListaConsutaAuditoriaDTO nodo = new ListaConsutaAuditoriaDTO();
-								nodo.setCentro(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getCOD_INTERNO_UO());
-								nodo.setCodigo(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getCOD_TX());
-								nodo.setTerminal(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_INTERNO_TERM_TN());
-
-								nodo.setFechaContable(util
-										.formatearFechaGeneral(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-												.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getFECHA_CTBLE()));
-								nodo.setAutorizador(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_EMPL_AUT() == null
-												? ""
-												: datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-														.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i)
-														.getID_EMPL_AUT());
-								nodo.setEmpleado(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getID_INTERNO_EMPL_EP());
-								nodo.setEstado(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getPRPDAD_CTA());
-								nodo.setHoraOperacion(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-										.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getHORA_OPRCN());
-								nodo.setFechaOperacion(util
-										.formatearFechaGeneral(datos.getResponseBansefi().getOTR_TX_CONS_AUDIT_TRN_O()
-												.getTR_TX_CONS_AUDIT_EVT_Z().getAF_AUDIT_E().get(i).getFECHA_OPRCN()));
-								auditorias.add(nodo);
-							}
-							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
-							response.setCabecera(cabecera);
-							response.setAuditorias(auditorias);
-
-						}
-					}
-
-				} catch (ParseException e) {
-					e.printStackTrace();
-					cabecera.setMensaje(errorParseo + e.getMessage());
-					cabecera.setStatus(statusIncorrecto);
-					response.setCabecera(cabecera);
-				}
-			} else {
-				cabecera.setStatus(statusIncorrecto);
-				cabecera.setMensaje(errorGeneral + errornoRequest);
-				response.setCabecera(cabecera);
-			}
-		}
-
-		return response;
-	}
 
 	/* Metodo para obtener el detalle de auditoria */
 	@SuppressWarnings("unchecked")
@@ -950,13 +671,13 @@ public class ConsultaClient {
 								lista.add(errores);
 							}
 							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setMensaje(errorGeneral +":"+datos.getCODIGO()+"-"+ datos.getMENSAJE());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O().getRTRN_CD());
 							response.setCabecera(cabecera);
 						} else {
 
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusCorrecto);
 							response.setCabecera(cabecera);
 							response.setNombreAutorizador(datos.getResponseBansefi().getOTR_CARGAR_AUDIT_TRN_O()
 									.getTR_CARGAR_AUDIT_EVT_Z().getNOMB_EMPL_AUT().getNOMB_50() == null ? ""
@@ -994,137 +715,7 @@ public class ConsultaClient {
 		return response;
 	}
 
-	/* Consulta liquidaciones de un movimiento */
-	@SuppressWarnings("unchecked")
-	public ResConsultaLiquidacionDTO consultaLiquidacion(ReqConsultaLiquidacionDTO request) {
-		ResConsultaLiquidacionDTO response = new ResConsultaLiquidacionDTO();
-		ResGralDTO cabecera = new ResGralDTO();
-		ConsultaLiquidacionDTO datos = new ConsultaLiquidacionDTO();
-		String jsonRes = "";
-		request.setAcuerdo(request.getAcuerdo() == null ? "" : request.getAcuerdo());
-		request.setDetalle(request.getDetalle() == null ? "" : request.getDetalle());
-		request.setEntidad(request.getEntidad() == null ? "" : request.getEntidad());
-		request.setFechaLiquidacion(request.getFechaLiquidacion() == null ? "" : request.getFechaLiquidacion());
-		request.setLiqOpcion(request.getLiqOpcion() == null ? "" : request.getLiqOpcion());
-		request.setPassword(request.getPassword() == null ? "" : request.getPassword());
-		request.setTerminal(request.getTerminal() == null ? "" : request.getTerminal());
-		request.setUsuario(request.getUsuario() == null ? "" : request.getUsuario());
-		if (request.getAcuerdo().equals("") || request.getEntidad().equals("") || request.getPassword().equals("")
-				|| request.getTerminal().equals("") || request.getUsuario().equals("")
-				|| request.getDetalle().equals("") || request.getLiqOpcion().equals("")
-				|| request.getFechaLiquidacion().equals("")) {
-			cabecera.setStatus(statusIncorrecto);
-			cabecera.setMensaje(errorGeneral + errornoRequest);
-			response.setCabecera(cabecera);
-		} else {
-			jsonRes = this.util.callRestPost(request, urlRootContext + urlConsultaLiquidacion);
-			System.out.println(jsonRes + ",");
 
-			if (!jsonRes.equals("")) {
-				ArrayList<String> nodos = new ArrayList<String>();
-				nodos.add(ejecutarResponse);
-				nodos.add(ejecutarResult);
-				try {
-					datos = (ConsultaLiquidacionDTO) this.util.jsonToObject(datos, jsonRes, nodos);
-					if (datos.getTRANID().equals(errornoFirmado)) {
-						cabecera.setMensaje(errorGeneral + errorUsuario);
-						cabecera.setStatus(statusIncorrecto);
-						response.setCabecera(cabecera);
-					}
-
-					else {
-
-						if (Integer.valueOf(
-								datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O().getOCCURS_NR()) == 0) {
-							ArrayList<ResErrorDTO> lista = new ArrayList<ResErrorDTO>();
-							for (int i = 0; i < datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getSTD_TRN_MSJ_PARM_V().size(); i++) {
-								ResErrorDTO errores = new ResErrorDTO();
-								errores.setCodigo(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_CODE());
-								errores.setMensaje(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getSTD_TRN_MSJ_PARM_V().get(i).getTEXT_ARG1());
-								lista.add(errores);
-							}
-							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
-							response.setCabecera(cabecera);
-						} else {
-							ArrayList<ListaLiquidacionDTO> liquidaciones = new ArrayList<ListaLiquidacionDTO>();
-
-							response.setAcuerdo(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getNUM_SEC_AC());
-							;
-							response.setFechaDesde(
-									util.formatearFechaGeneral(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-											.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getFECHA_DESDE()));
-							response.setFechaHasta(
-									util.formatearFechaGeneral(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-											.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getFECHA_HASTA()));
-							response.setFechaLiquidacion(
-									util.formatearFechaGeneral(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-											.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getFECHA_LIQ()));
-							response.setFechaUltimoCobro(
-									util.formatearFechaGeneral(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-											.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getFECHA_ULT_COBRO()));
-							response.setSituacion(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getSITUACION_HL());
-							response.setCodigoOperacionLiquidacion(
-									datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-											.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getCOD_OPER_LIQ());
-							response.setMoneda(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getCOD_NUMRCO_MONEDA());
-							response.setImporteTotal(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getIMP_TOTAL_LIQ());
-							response.setImportePendiente(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getTR_LIQ_CONS_BASICA_EVT_Z().getHL_HCO_LIQ_E().getIMP_PEND_LIQ());
-							for (int i = 0; i < Integer.valueOf(datos.getResponseBansefi()
-									.getOTR_LIQ_CONS_BASICA_TRN_O().getTR_LIQ_CONS_BASICA_EVT_Z()
-									.getLIQ_APUNTE_BAS_LST().getNUMBER_OF_RECORDS()); i++) {
-								ListaLiquidacionDTO nodo = new ListaLiquidacionDTO();
-								nodo.setCodigoOrigen(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V()
-										.get(i).getCOD_CTA());
-								nodo.setImporteAjustado(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V()
-										.get(i).getIMP_AJUSTADO_V().getIMP_SDO());
-								nodo.setImporteCondonado(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V()
-										.get(i).getIMP_CONDONADO_V().getIMP_SDO());
-								nodo.setImporteFacturado(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V()
-										.get(i).getIMP_FACTURADO_V().getIMP_SDO());
-								nodo.setImportePendiente(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-										.getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V()
-										.get(i).getIMP_PENDIENTE_V().getIMP_SDO());
-								liquidaciones.add(nodo);
-							}
-							response.setLiquidaciones(liquidaciones);
-							System.out.print(datos.getResponseBansefi().getOTR_LIQ_CONS_BASICA_TRN_O()
-									.getTR_LIQ_CONS_BASICA_EVT_Z().getLIQ_APUNTE_BAS_LST().getLIQ_APUNTE_BAS_V().get(0)
-									.getIMP_FACTURADO_V().getIMP_SDO());
-							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
-							response.setCabecera(cabecera);
-
-						}
-					}
-
-				} catch (ParseException e) {
-					e.printStackTrace();
-					cabecera.setMensaje(errorParseo + e.getMessage());
-					cabecera.setStatus(statusIncorrecto);
-					response.setCabecera(cabecera);
-				}
-			} else {
-				cabecera.setStatus(statusIncorrecto);
-				cabecera.setMensaje(errorGeneral + errornoRequest);
-				response.setCabecera(cabecera);
-			}
-		}
-		return response;
-	}
 
 	@SuppressWarnings("unchecked")
 	public ResConsultaChequeDTO consultaCheque(ReqConsultaChequeDTO request) {
@@ -1177,10 +768,11 @@ public class ConsultaClient {
 								lista.add(errores);
 							}
 							cabecera.setErrores(lista);
-							cabecera.setMensaje(errorGeneral + datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setMensaje(errorGeneral +":"+datos.getCODIGO()+"-"+ datos.getMENSAJE());
+							cabecera.setStatus(statusIncorrecto+"-"+statusTCB+datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T().getRTRN_CD());
 							response.setCabecera(cabecera);
 						} else {
+							response.setFechaVencimiento(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T().getTR_CP_CONSULTA_DETALLE_EV().getFECHA_ACTVCN_PAG());
 							response.setAcuerdo(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
 									.getTR_CP_CONSULTA_DETALLE_EV().getCP_ACUERDO_CARGO_V().getNUM_SEC_AC());
 							response.setCentro(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
@@ -1192,10 +784,9 @@ public class ConsultaClient {
 							response.setEstado("Por determinar");
 							response.setNombre(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
 									.getTR_CP_CONSULTA_DETALLE_EV().getNOMB_50());
-							response.setNumeroCheque(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
-									.getTR_CP_CONSULTA_DETALLE_EV().getNUM_CHQ_PAG());
+							response.setNumeroCheque(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T().getTR_CP_CONSULTA_DETALLE_EV().getNUM_CHQ_PAG());
 							response.setCodigoCaja(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
-									.getTR_CP_CONSULTA_DETALLE_EV().getNUM_CHQ_PAG_CP());
+									.getTR_CP_CONSULTA_DETALLE_EV().getCOD_CJ_CHQ_PG());
 							response.setNumeroTalonario(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
 									.getTR_CP_CONSULTA_DETALLE_EV().getNUM_CHQ_PAG());
 							response.setPagoCheque(datos.getResponseBansefi().getOTR_CP_CONSULTA_DETALLE_T()
@@ -1206,7 +797,7 @@ public class ConsultaClient {
 									.getTR_CP_CONSULTA_DETALLE_EV().getECV_ACTUAL());
 							response.setTipoTalonario("por determinar");
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusCorrecto);
 							response.setCabecera(cabecera);
 
 						}
@@ -1262,7 +853,7 @@ public class ConsultaClient {
 							response.setCabecera(cabecera);
 						}else{
 							cabecera.setMensaje(datos.getMENSAJE());
-							cabecera.setStatus(datos.getCODIGO());
+							cabecera.setStatus(statusCorrecto);
 							response.setCabecera(cabecera);
 							response.setIdInternoPe(datos.getResponseBansefi().getResponseBansefi().getID_INTERNO_PE());
 							response.setNombre(datos.getResponseBansefi().getResponseBansefi().getNOMBRE());

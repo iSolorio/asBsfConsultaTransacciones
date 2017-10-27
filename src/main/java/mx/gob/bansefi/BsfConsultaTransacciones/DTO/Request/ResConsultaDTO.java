@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.ResponseBansefiDTO;
+import mx.gob.bansefi.BsfConsultaTransacciones.DTO.Consulta.Transaccion.ResponseBansefiDTO;
 
 @AllArgsConstructor
 @NoArgsConstructor

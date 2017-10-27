@@ -58,7 +58,7 @@ public class EndpointController {
 	@RequestMapping(value="consultaDetalleTransaccion",method=RequestMethod.POST)
 	public ResConsultaDetalleTransaccionDTO consultaDetalleTransaccion(@RequestBody ReqConsultaDetalleTransaccionDTO request)
 	{
-		return consultaclient.consultaDetalletransaccion(request);
+		return consultaService.consultaDetalletransaccion(request);
 	}
 	@RequestMapping(value="consultaNombre",method=RequestMethod.POST)
 	public ResConsultaNombreDTO consultaNombre(@RequestBody RequestConsultaNombreDTO request)
@@ -86,7 +86,7 @@ public class EndpointController {
 	@RequestMapping(value="consultaAuditoria",method=RequestMethod.POST)
 	public ResConsultaAuditoriaDTO consultaAuditoria(@RequestBody ReqConsultaAuditoriaDTO request) 
 	{
-		return consultaclient.consultaAuditoria(request);
+		return consultaService.consultaAuditoria(request);
 	}
 	@RequestMapping(value="consultaMasAuditoria", method=RequestMethod.POST)
 	public ResConsultaMasAuditoriaDTO  consultaMasAuditoria(@RequestBody ReqConsultaMasAuditoriaDTO request)
@@ -96,7 +96,7 @@ public class EndpointController {
 	@RequestMapping(value="consultaLiquidacion", method=RequestMethod.POST)
 	public ResConsultaLiquidacionDTO consultaLiquidacion(@RequestBody ReqConsultaLiquidacionDTO request )
 	{
-		return consultaclient.consultaLiquidacion(request);
+		return consultaService.consultaLiquidacion(request);
 	}
 	@RequestMapping(value="consultaCheque", method=RequestMethod.POST)
 	public ResConsultaChequeDTO consultaCheque(@RequestBody ReqConsultaChequeDTO request)
@@ -105,6 +105,7 @@ public class EndpointController {
 	}
 	@RequestMapping(value="consultaAnotaciones",method=RequestMethod.POST)
 	public ResConsultaAnotacionesDTO consultaAnotaciones(@RequestBody ReqConsultaAnotacionesDTO request) {
+		System.out.println(request.getAcuerdo());
 		return consultaService.consultaAnotaciones(request);
 	}
 	@RequestMapping(value="consultaDetalleAnotacion",method=RequestMethod.POST)
